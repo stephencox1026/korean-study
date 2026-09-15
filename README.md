@@ -37,7 +37,15 @@ npm run build
 
 This is a static site — no backend required. Deploy the project root after `npm run build`.
 
-### Cloudflare Pages (recommended)
+### GitHub Pages (included)
+
+Pushes to `main` deploy automatically via [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml).
+
+Live site: **https://stephencox1026.github.io/korean-study/**
+
+Enable in repo settings if needed: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+### Cloudflare Pages (recommended for custom domain)
 
 1. Push this repo to GitHub.
 2. In [Cloudflare Pages](https://pages.cloudflare.com/), create a project from the repo.

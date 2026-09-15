@@ -1,0 +1,165 @@
+/* Group mode — layout overrides only (colors/tiles from style.css) */
+
+#solved-groups {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--tile-gap) * 2);
+  width: 100%;
+  min-height: 0;
+}
+
+.solved-group-row {
+  animation: solvedBarIn 220ms var(--ease-out);
+}
+
+#solved-groups .solved-tile {
+  cursor: default;
+}
+
+#solved-groups .solved-tile.with-translation {
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 6px;
+}
+
+#solved-groups .solved-tile .slot-korean {
+  font-size: var(--tile-font);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+#solved-groups .solved-tile .slot-english {
+  font-size: var(--tile-english-font);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-muted);
+}
+
+#solved-groups .cat-green .solved-tile {
+  background: var(--cat-green-fill);
+}
+
+#solved-groups .cat-blue .solved-tile {
+  background: var(--cat-blue-fill);
+}
+
+#solved-groups .cat-purple .solved-tile {
+  background: var(--cat-purple-fill);
+}
+
+#solved-groups .cat-orange .solved-tile {
+  background: var(--cat-orange-fill);
+}
+
+@keyframes solvedBarIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#tile-grid .pool-tile.shake {
+  animation: tileShake 420ms var(--ease-out);
+}
+
+@keyframes tileShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+#tile-grid .pool-tile.selected.shake {
+  animation: tileShakeSelected 420ms var(--ease-out);
+}
+
+@keyframes tileShakeSelected {
+  0%, 100% { transform: scale(1.04) translateX(0); }
+  20% { transform: scale(1.04) translateX(-5px); }
+  40% { transform: scale(1.04) translateX(5px); }
+  60% { transform: scale(1.04) translateX(-4px); }
+  80% { transform: scale(1.04) translateX(4px); }
+}
+
+.game-toast {
+  margin: 0 auto 10px;
+  max-width: var(--board-max);
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: var(--text-dark);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+.game-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mistakes-panel {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.mistakes-label {
+  margin: 0 0 8px;
+  font-size: clamp(0.78rem, 2.4vw, 0.88rem);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.mistakes-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.mistake-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--text-dark);
+  transition: background 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+
+.mistake-dot.is-used {
+  background: transparent;
+  border: 1.5px solid #b0b0ac;
+}
+
+@media (max-width: 520px) {
+  #solved-groups .solved-tile.with-translation {
+    padding: 5px 3px;
+    gap: 1px;
+  }
+
+  #solved-groups .solved-tile .slot-korean {
+    line-height: 1.1;
+  }
+
+  #solved-groups .solved-tile .slot-english {
+    line-height: 1.1;
+  }
+
+  #tile-grid .pool-tile.selected.shake {
+    animation: tileShakeSelectedMobile 420ms var(--ease-out);
+  }
+}
+
+@keyframes tileShakeSelectedMobile {
+  0%, 100% { transform: scale(1.02) translateX(0); }
+  20% { transform: scale(1.02) translateX(-5px); }
+  40% { transform: scale(1.02) translateX(5px); }
+  60% { transform: scale(1.02) translateX(-4px); }
+  80% { transform: scale(1.02) translateX(4px); }
+}

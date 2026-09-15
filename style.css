@@ -1,0 +1,967 @@
+/* ==========================================================================
+   Korean Flashcards
+   Palette and sizing knobs live in :root, so most restyling happens there.
+   ========================================================================== */
+
+:root {
+  --bg: #f7f4ef;
+  --bg-tint: #efe9e0;
+  --surface: #ffffff;
+  --ink: #23201c;
+  --ink-soft: #6c655c;
+  --ink-faint: #a49b90;
+  --accent: #c2563c;
+  --accent-soft: #f3ded8;
+  --line: #e4ddd3;
+
+  --shadow-card: 0 1px 2px rgba(35, 32, 28, 0.06),
+                 0 12px 24px -8px rgba(35, 32, 28, 0.18),
+                 0 28px 56px -20px rgba(35, 32, 28, 0.22);
+  --shadow-btn: 0 1px 2px rgba(35, 32, 28, 0.08);
+
+  --radius-card: 24px;
+  --radius-btn: 12px;
+  --control-h: 44px;
+
+  --flip-duration: 0.55s;
+  --flip-ease: cubic-bezier(0.2, 0.8, 0.25, 1);
+
+  /* Korean fallbacks first so Hangul never lands on a substituted glyph. */
+  --font-stack: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
+                -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, var(--bg-tint), transparent 70%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh; /* accounts for mobile browser chrome */
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 3vw, 28px);
+}
+
+/* ---------- Header: deck picker + start-language toggle ---------- */
+
+.app-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.2vw, 1.65rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--ink);
+}
+
+.app-nav {
+  margin: 0;
+  text-align: center;
+  font-size: 0.88rem;
+}
+
+.app-nav a {
+  color: var(--ink-muted, #6b6b68);
+  text-decoration: none;
+}
+
+.app-nav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.app-nav-sep {
+  margin: 0 0.35rem;
+  color: var(--ink-faint, #aaa);
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.setting {
+  display: flex;
+  min-width: 0;
+  width: 50%;
+}
+
+.deck-picker {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background-color: var(--surface);
+  box-shadow: var(--shadow-btn);
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 30px 0 12px;
+  /* Chevron drawn inline so the app stays dependency-free. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236c655c' stroke-width='1.75' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease;
+}
+
+.deck-picker:hover {
+  border-color: var(--ink-faint);
+}
+
+.day-filter {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.day-filter[hidden] {
+  display: none;
+}
+
+.day-filter-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.day-filter-option {
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.day-filter-option:hover {
+  color: var(--accent);
+}
+
+.day-filter-option.is-active {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---------- Stage: card + sentence ---------- */
+
+.stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(16px, 3vw, 24px);
+}
+
+/* The card absorbs whatever height the rest of the UI does not need, so a
+   two-line example sentence can never push the controls off a phone screen. */
+.card-wrap {
+  position: relative;
+  perspective: 1400px;
+  flex: 1 1 auto;
+  min-height: 160px;
+  max-height: 380px;
+}
+
+/* Pinned to the wrapper rather than sized with a percentage height, which
+   would collapse to zero against a flex-sized parent. */
+.card {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.22s var(--flip-ease), opacity 0.22s ease;
+}
+
+.card:focus-visible .card-face {
+  box-shadow: var(--shadow-card), 0 0 0 3px var(--accent-soft);
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--flip-duration) var(--flip-ease);
+}
+
+.card.is-flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: clamp(20px, 5vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-card);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  text-align: center;
+  overflow: hidden;
+}
+
+.card-face--back {
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(170deg, #fffdfb 0%, var(--surface) 55%);
+}
+
+.card-hint {
+  position: absolute;
+  top: clamp(14px, 3vw, 20px);
+  left: 0;
+  right: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+.card-word {
+  font-size: clamp(3.1rem, 14vw, 5.4rem);
+  font-weight: 650;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  /* Long compounds like 머리카락 should shrink rather than clip. */
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* English words read better a touch smaller than Hangul at the same size,
+   and some entries are short phrases that need room to wrap. */
+.card-word[lang="en"] {
+  font-size: clamp(2.3rem, 10.5vw, 4.4rem);
+}
+
+/* Length-aware steps, applied by sizeClass() in app.js. Phrase entries like
+   '천천히 말해 주세요' or 'older brother (said by a male)' would otherwise
+   overflow the card on a small screen. */
+.card-word.is-sm {
+  font-size: clamp(2rem, 8.5vw, 3.4rem);
+}
+
+.card-word.is-xs {
+  font-size: clamp(1.6rem, 6.6vw, 2.7rem);
+}
+
+.card-word[lang="en"].is-sm {
+  font-size: clamp(1.8rem, 7.5vw, 3rem);
+}
+
+.card-word[lang="en"].is-xs {
+  font-size: clamp(1.4rem, 5.6vw, 2.3rem);
+}
+
+.card-romanization {
+  font-size: clamp(1.2rem, 4.6vw, 1.6rem);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+/* ---------- Discrete navigation arrows beside the card ---------- */
+
+.card-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Above the card, which builds a 3D stacking context with preserve-3d. */
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--ink-faint);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.card-nav svg {
+  width: 22px;
+  height: 22px;
+}
+
+.card-nav:hover,
+.card-nav:focus-visible {
+  opacity: 1;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  outline: none;
+}
+
+.card-nav:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.card-nav--prev {
+  left: 2px;
+}
+
+.card-nav--next {
+  right: 2px;
+}
+
+/* Touch screens have no hover, so sit a little more visible at rest. */
+@media (hover: none) {
+  .card-nav {
+    opacity: 0.55;
+  }
+}
+
+/* Enough window to clear the 720px app: move the arrows off the card entirely. */
+@media (min-width: 860px) {
+  .card-nav--prev {
+    left: -60px;
+  }
+
+  .card-nav--next {
+    right: -60px;
+  }
+}
+
+/* ---------- Speaker buttons ---------- */
+
+.speak-btn {
+  position: absolute;
+  z-index: 3;
+  pointer-events: auto;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--ink-faint);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.speak-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.speak-btn:hover,
+.speak-btn:focus-visible {
+  opacity: 1;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  outline: none;
+}
+
+.speak-btn:active {
+  transform: scale(0.92);
+}
+
+.speak-btn--card {
+  right: clamp(10px, 2.5vw, 14px);
+  bottom: clamp(10px, 2.5vw, 14px);
+}
+
+.speak-btn--sentence {
+  right: clamp(10px, 2.5vw, 14px);
+  bottom: clamp(10px, 2.5vw, 14px);
+}
+
+@media (hover: none) {
+  .speak-btn {
+    opacity: 0.55;
+  }
+}
+
+/* Fade-and-slide when moving to another card, so the flip never plays in reverse. */
+.card.is-changing {
+  opacity: 0;
+}
+
+.card.is-changing--next {
+  transform: translateX(14px);
+}
+
+.card.is-changing--prev {
+  transform: translateX(-14px);
+}
+
+/* ---------- Sentence panel ---------- */
+
+.sentence-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: clamp(14px, 3vw, 18px) clamp(16px, 4vw, 22px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.62);
+  /* Title stays pinned at the top on both faces; min-height keeps the card
+     from jumping when the breakdown appears on flip. */
+  justify-content: flex-start;
+  align-items: stretch;
+  min-height: clamp(140px, 39vw, 210px);
+  transition: opacity 0.2s ease;
+}
+
+/* Sentence and breakdown share one left-aligned block below the title. */
+.sentence-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.sentence-panel.is-swapping {
+  opacity: 0;
+}
+
+.sentence-label {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  text-align: left;
+}
+
+.sentence-text {
+  margin: 0;
+  width: 100%;
+  font-size: clamp(1.5rem, 6vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+  text-align: center;
+}
+
+/* Two-clause examples from the connectors deck run long. Stepping them down
+   keeps the panel from swallowing the card on a phone. */
+.sentence-text.is-sm {
+  font-size: clamp(1.3rem, 5.2vw, 2rem);
+}
+
+.sentence-text.is-xs {
+  font-size: clamp(1.15rem, 4.4vw, 1.7rem);
+}
+
+.sentence-text[lang="en"] {
+  font-size: clamp(1.25rem, 5.2vw, 2rem);
+}
+
+.sentence-text[lang="en"].is-sm {
+  font-size: clamp(1.1rem, 4.5vw, 1.75rem);
+}
+
+.sentence-text[lang="en"].is-xs {
+  font-size: clamp(1rem, 3.9vw, 1.5rem);
+}
+
+.sentence-panel.is-answer .sentence-text[lang="en"] {
+  font-size: clamp(1.15rem, 4.8vw, 1.875rem);
+}
+
+.sentence-panel.is-answer .sentence-text[lang="en"].is-sm {
+  font-size: clamp(1.05rem, 4.2vw, 1.625rem);
+}
+
+.sentence-panel.is-answer .sentence-text[lang="en"].is-xs {
+  font-size: clamp(0.95rem, 3.7vw, 1.4rem);
+}
+
+/* ---------- Word-by-word breakdown ---------- */
+
+/* Each chunk is a little column: Korean on top, its meaning underneath, the
+   way the sentences are annotated by hand. Wraps to another row when needed. */
+.breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px clamp(12px, 3vw, 18px);
+  width: 100%;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.breakdown:empty {
+  display: none;
+}
+
+.sentence-text[lang="en"] ~ .breakdown {
+  justify-content: center;
+}
+
+.sentence-text[lang="en"] ~ .breakdown .chunk {
+  align-items: center;
+}
+
+.sentence-text[lang="en"] ~ .breakdown .chunk-en {
+  text-align: center;
+}
+
+.chunk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+/* Answer side: English sentence and Korean chunks match; both a touch smaller
+   than the Korean-only example on the front. */
+.sentence-panel.is-answer .sentence-text {
+  font-size: clamp(1.375rem, 5.75vw, 2.25rem);
+}
+
+.sentence-panel.is-answer .sentence-text.is-sm {
+  font-size: clamp(1.2rem, 5vw, 1.875rem);
+}
+
+.sentence-panel.is-answer .sentence-text.is-xs {
+  font-size: clamp(1.075rem, 4.2vw, 1.625rem);
+}
+
+.chunk-ko {
+  font-size: clamp(1.375rem, 5.75vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.sentence-panel.is-answer .sentence-text.is-sm ~ .breakdown .chunk-ko {
+  font-size: clamp(1.2rem, 5vw, 1.875rem);
+}
+
+.sentence-panel.is-answer .sentence-text.is-xs ~ .breakdown .chunk-ko {
+  font-size: clamp(1.075rem, 4.2vw, 1.625rem);
+}
+
+.chunk-particle {
+  display: inline-block;
+  margin-left: 1px;
+  padding: 0 3px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  color: var(--accent);
+}
+
+.chunk-en {
+  font-size: clamp(0.875rem, 3.55vw, 1.075rem);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink-faint);
+  text-align: left;
+}
+
+/* ---------- Footer: controls + progress ---------- */
+
+.app-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.controls .btn {
+  width: 100%;
+  min-width: 0;
+}
+
+.btn {
+  min-height: 46px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-btn);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-btn);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.18s ease,
+              background-color 0.18s ease, color 0.18s ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--ink-faint);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  border-color: var(--accent);
+  background-color: #ad4b34;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.progress-text {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 99px;
+  background-color: var(--line);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background-color: var(--accent);
+  transition: width 0.3s var(--flip-ease);
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 26px;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  opacity: 0.55;
+  transition: opacity 0.18s ease, background-color 0.18s ease;
+}
+
+.lang-toggle:hover,
+.lang-toggle:focus-within {
+  opacity: 0.85;
+  background-color: var(--surface);
+}
+
+.lang-toggle-option {
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.lang-toggle-option:hover {
+  color: var(--accent);
+}
+
+.lang-toggle-option.is-active {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  opacity: 1;
+}
+
+.lang-toggle:hover .lang-toggle-option.is-active,
+.lang-toggle:focus-within .lang-toggle-option.is-active {
+  opacity: 1;
+}
+
+.shuffle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--ink-faint);
+  opacity: 0.35;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: opacity 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.shuffle-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.shuffle-btn:hover,
+.shuffle-btn:focus-visible {
+  opacity: 0.7;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  outline: none;
+}
+
+.shuffle-btn.is-active {
+  opacity: 0.85;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+.shuffle-btn.is-active:hover,
+.shuffle-btn.is-active:focus-visible {
+  opacity: 1;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+.shuffle-btn:active {
+  transform: scale(0.92);
+}
+
+.shuffle-btn:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+/* Very narrow screens: multi-word glosses such as "waist, lower back" need a
+   step down in size to stay inside the card. */
+@media (max-width: 360px) {
+  .card-word {
+    font-size: clamp(2.4rem, 12vw, 3.4rem);
+  }
+
+  .card-word[lang="en"] {
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+  }
+
+  .card-word.is-sm {
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+  }
+
+  .card-word.is-xs {
+    font-size: clamp(1.35rem, 5.4vw, 1.9rem);
+  }
+
+  .card-word[lang="en"].is-sm {
+    font-size: clamp(1.5rem, 6.2vw, 2.1rem);
+  }
+
+  .card-word[lang="en"].is-xs {
+    font-size: clamp(1.15rem, 4.8vw, 1.6rem);
+  }
+
+  /* Breakdown chunks wrap to three rows at this width, so buy the rows back
+     from the padding and the card floor rather than from the text size. */
+  .card-wrap {
+    min-height: 148px;
+  }
+
+  .sentence-panel {
+    padding: 12px 14px;
+  }
+
+  .breakdown {
+    gap: 6px 11px;
+    padding-top: 8px;
+  }
+}
+
+/* Short viewports: give the sentence and controls priority over card size. */
+@media (max-height: 700px) {
+  .app {
+    gap: 12px;
+  }
+
+  .card-wrap {
+    min-height: 125px;
+  }
+
+  .card-word {
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+  }
+
+  .card-word[lang="en"] {
+    font-size: clamp(1.7rem, 7vw, 2.6rem);
+  }
+
+  /* A 125px-tall card cannot hold a wrapped phrase at full size. */
+  .card-word.is-sm {
+    font-size: clamp(1.5rem, 6.2vw, 2.2rem);
+  }
+
+  .card-word.is-xs {
+    font-size: clamp(1.2rem, 4.8vw, 1.7rem);
+  }
+
+  .card-word[lang="en"].is-sm {
+    font-size: clamp(1.3rem, 5.4vw, 1.9rem);
+  }
+
+  .card-word[lang="en"].is-xs {
+    font-size: clamp(1rem, 4.2vw, 1.4rem);
+  }
+
+  .card-romanization {
+    font-size: clamp(0.95rem, 3.6vw, 1.2rem);
+  }
+
+  .sentence-panel {
+    padding: 11px 13px;
+    gap: 4px;
+  }
+
+  .sentence-text {
+    font-size: clamp(1.25rem, 5vw, 1.8rem);
+  }
+
+  .sentence-panel.is-answer .sentence-text {
+    font-size: clamp(1.125rem, 4.75vw, 1.675rem);
+  }
+
+  .sentence-text.is-sm {
+    font-size: clamp(1.1rem, 4.4vw, 1.5rem);
+  }
+
+  .sentence-panel.is-answer .sentence-text.is-sm {
+    font-size: clamp(1rem, 4.1vw, 1.4rem);
+  }
+
+  .sentence-text.is-xs {
+    font-size: clamp(1rem, 3.8vw, 1.3rem);
+  }
+
+  .sentence-panel.is-answer .sentence-text.is-xs {
+    font-size: clamp(0.925rem, 3.55vw, 1.2rem);
+  }
+
+  .chunk-ko {
+    font-size: clamp(1.125rem, 4.75vw, 1.675rem);
+  }
+
+  .sentence-panel.is-answer .sentence-text.is-sm ~ .breakdown .chunk-ko {
+    font-size: clamp(1rem, 4.1vw, 1.4rem);
+  }
+
+  .sentence-panel.is-answer .sentence-text.is-xs ~ .breakdown .chunk-ko {
+    font-size: clamp(0.925rem, 3.55vw, 1.2rem);
+  }
+
+  .chunk-en {
+    font-size: clamp(0.8rem, 3rem, 0.95rem);
+  }
+
+  .breakdown {
+    padding-top: 6px;
+    gap: 5px 10px;
+    margin-top: 2px;
+  }
+
+}
+
+@media (max-width: 520px) {
+  .setting {
+    width: 80%;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-inner,
+  .card,
+  .sentence-panel,
+  .progress-bar-fill {
+    transition-duration: 0.01ms;
+  }
+}

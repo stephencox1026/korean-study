@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Korean Connections — Practice</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="placement-mode">
+  <!-- SHARED SHELL: header -->
+  <header class="app-header">
+    <div class="header-row">
+      <h1 class="app-title">Korean Connections</h1>
+      <p id="puzzle-label" class="puzzle-label"></p>
+    </div>
+    <nav class="mode-nav" aria-label="Game mode">
+      <a href="../index.html" class="mode-link">Flashcards</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="index.html" class="mode-link">Group</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="one-shot.html" class="mode-link">One Shot</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="practice.html" class="mode-link is-active">Practice</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="../privacy.html" class="mode-link">Privacy</a>
+    </nav>
+  </header>
+
+  <!-- MODE: category placement board -->
+  <section id="play-top" class="section">
+    <div class="board-width">
+      <div id="category-board" class="category-board"></div>
+    </div>
+  </section>
+
+  <hr class="section-divider" aria-hidden="true">
+
+  <!-- SHARED SHELL: pool section -->
+  <section id="pool" class="section">
+    <div class="board-width">
+      <p class="pool-hint">Drag Tile To Correct Section Above</p>
+      <div id="tile-grid" class="tile-grid"></div>
+      <div class="pool-controls">
+        <button type="button" id="clear-wrong-btn" class="btn-pill pressable">Clear</button>
+        <button type="button" id="submit-btn" class="btn-pill pressable">Submit</button>
+        <button type="button" id="show-answer-btn" class="btn-pill pressable">Show Answer</button>
+        <button type="button" id="new-puzzle-btn" class="btn-pill pressable">New Puzzle</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHARED SHELL: win modal -->
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <div class="results-modal">
+      <button type="button" id="modal-close-btn" class="modal-close-btn pressable" aria-label="Close">×</button>
+      <h3 class="modal-title">You solved it!</h3>
+      <p class="modal-sub">All 16 words sorted correctly.</p>
+      <button type="button" id="play-again-btn" class="btn-pill pressable ready">Play Again</button>
+    </div>
+  </div>
+
+  <script src="daily.js" defer></script>
+  <script src="puzzles/prototype-01.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Korean flashcards with audio and breakdowns, plus a daily Connections word puzzle. Free study tool for learners.">
+  <title>Korean Flashcards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <header class="app-header">
+      <h1 class="app-title">Korean Flashcards</h1>
+      <p class="app-nav">
+        <a href="connections/">Korean Connections</a>
+        <span class="app-nav-sep" aria-hidden="true">·</span>
+        <a href="privacy.html">Privacy</a>
+      </p>
+
+      <div class="settings">
+        <label class="setting">
+          <select id="deck-picker" class="deck-picker" aria-label="Deck"></select>
+        </label>
+        <div class="day-filter" id="day-filter" hidden>
+          <div class="day-filter-group" role="group" aria-label="Filter by day character">
+            <button type="button" class="day-filter-option is-active" data-day="all">All</button>
+            <button type="button" class="day-filter-option" data-day="월">월</button>
+            <button type="button" class="day-filter-option" data-day="화">화</button>
+            <button type="button" class="day-filter-option" data-day="수">수</button>
+            <button type="button" class="day-filter-option" data-day="목">목</button>
+            <button type="button" class="day-filter-option" data-day="금">금</button>
+            <button type="button" class="day-filter-option" data-day="토">토</button>
+            <button type="button" class="day-filter-option" data-day="일">일</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+
+      <!-- The card, flanked by discrete navigation arrows. Click (or press
+           space) to flip. The arrows are siblings of the card, so clicking one
+           cannot bubble into the flip handler. -->
+      <div class="card-wrap">
+
+        <button type="button" class="card-nav card-nav--prev" id="card-prev" aria-label="Previous card">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 4L7 12l8 8" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        <div class="card" id="card" tabindex="0" role="button" aria-label="Flashcard, activate to flip">
+          <div class="card-inner">
+
+            <div class="card-face card-face--front">
+              <span class="card-hint" id="front-hint"></span>
+              <div class="card-word" id="front-word"></div>
+            </div>
+
+            <div class="card-face card-face--back">
+              <span class="card-hint" id="back-hint"></span>
+              <div class="card-word" id="back-word"></div>
+              <!-- Romanization lives on the answer side only, so it never gives away pronunciation. -->
+              <div class="card-romanization" id="back-romanization"></div>
+            </div>
+
+          </div>
+          <button type="button" class="speak-btn speak-btn--card" id="speak-card" aria-label="Listen to word">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" />
+              <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <button type="button" class="card-nav card-nav--next" id="card-next" aria-label="Next card">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+
+      </div>
+
+      <!-- Example sentence, always in the language of the face you are looking
+           at, plus a word-by-word breakdown once the answer is showing. -->
+      <section class="sentence-panel" id="sentence-panel" aria-live="polite">
+        <span class="sentence-label">Example</span>
+        <div class="sentence-content">
+          <p class="sentence-text" id="sentence-text"></p>
+          <div class="breakdown" id="breakdown"></div>
+        </div>
+        <button type="button" class="speak-btn speak-btn--sentence" id="speak-sentence" aria-label="Listen to example">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor" />
+            <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </section>
+
+    </main>
+
+    <footer class="app-footer">
+
+      <div class="controls">
+        <button type="button" class="btn" id="prev-btn" aria-label="Previous card">
+          <span aria-hidden="true">&#8592;</span> Prev
+        </button>
+        <button type="button" class="btn btn--primary" id="flip-btn">Flip</button>
+        <button type="button" class="btn" id="next-btn" aria-label="Next card">
+          Next <span aria-hidden="true">&#8594;</span>
+        </button>
+      </div>
+
+      <div class="progress">
+        <p class="progress-text" id="progress-text"></p>
+        <div class="progress-bar" role="presentation">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="footer-meta">
+        <div class="lang-toggle" id="start-language-toggle" role="group" aria-label="Which language shows first">
+          <button type="button" class="lang-toggle-option" data-language="korean">한국어</button>
+          <button type="button" class="lang-toggle-option" data-language="english">English</button>
+        </div>
+        <button type="button" class="shuffle-btn" id="shuffle-btn" aria-label="Shuffle deck">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" fill="none"
+                  stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+    </footer>
+
+  </div>
+
+  <!--
+    Vocab decks. Each file registers itself, so adding a new set is:
+      1. copy decks/_template.js to decks/set-09-yourtheme.js
+      2. paste your words in
+      3. add one <script> line below
+    See ADDING-A-SET.md for the details.
+  -->
+  <!-- Order = suggested learning path (see ADDING-A-SET.md). -->
+  <script src="decks/set-03-greetings.js"></script>
+  <script src="decks/set-09-markers.js"></script>
+  <script src="decks/set-10-verbs.js"></script>
+  <script src="decks/set-11-numbers.js"></script>
+  <script src="decks/set-02-family.js"></script>
+  <script src="decks/set-04-time.js"></script>
+  <script src="decks/set-25-sino-days.js"></script>
+  <script src="decks/set-12-food.js"></script>
+  <script src="decks/set-13-adjectives.js"></script>
+  <script src="decks/set-06-house.js"></script>
+  <script src="decks/set-05-position.js"></script>
+  <script src="decks/set-14-places.js"></script>
+  <script src="decks/set-15-colors.js"></script>
+  <script src="decks/set-16-shopping.js"></script>
+  <script src="decks/set-17-weather.js"></script>
+  <script src="decks/set-18-clothing.js"></script>
+  <script src="decks/set-01-body.js"></script>
+  <script src="decks/set-08-animals.js"></script>
+  <script src="decks/set-19-health.js"></script>
+  <script src="decks/set-20-school.js"></script>
+  <script src="decks/set-21-work.js"></script>
+  <script src="decks/set-22-hobbies.js"></script>
+  <script src="decks/set-23-transport.js"></script>
+  <script src="decks/set-24-kitchen.js"></script>
+  <script src="decks/set-07-connectors.js"></script>
+  <script src="decks/set-26-emotions.js"></script>
+  <script src="decks/set-27-nature.js"></script>
+  <script src="decks/set-28-technology.js"></script>
+  <script src="decks/set-29-professions.js"></script>
+  <script src="decks/set-30-culture.js"></script>
+  <script src="decks/set-31-formal-speech.js"></script>
+  <script src="decks/set-32-counters.js"></script>
+  <script src="decks/set-33-produce.js"></script>
+  <script src="decks/set-34-home-life.js"></script>
+  <script src="decks/set-35-travel.js"></script>
+
+  <script src="app.js"></script>
+
+</body>
+</html>

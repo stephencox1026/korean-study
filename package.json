@@ -1,0 +1,16 @@
+{
+  "name": "korean-study",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Korean flashcards and Connections word game",
+  "type": "module",
+  "scripts": {
+    "check": "node tools/check-decks.mjs",
+    "build": "node tools/check-decks.mjs && node tools/build-deck-groups.mjs",
+    "serve": "node tools/serve.mjs",
+    "start": "npm run serve"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

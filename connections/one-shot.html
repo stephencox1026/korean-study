@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Korean Connections — One Shot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="placement-mode">
+  <header class="app-header">
+    <div class="header-row">
+      <h1 class="app-title">Korean Connections</h1>
+      <p id="puzzle-label" class="puzzle-label"></p>
+    </div>
+    <nav class="mode-nav" aria-label="Game mode">
+      <a href="../index.html" class="mode-link">Flashcards</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="index.html" class="mode-link">Group</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="one-shot.html" class="mode-link is-active">One Shot</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="practice.html" class="mode-link">Practice</a>
+      <span class="mode-divider" aria-hidden="true">|</span>
+      <a href="../privacy.html" class="mode-link">Privacy</a>
+    </nav>
+  </header>
+
+  <section id="play-top" class="section">
+    <div class="board-width">
+      <div id="category-board" class="category-board"></div>
+    </div>
+  </section>
+
+  <hr class="section-divider" aria-hidden="true">
+
+  <section id="pool" class="section">
+    <div class="board-width">
+      <p class="pool-hint">Drag Tile To Correct Section Above</p>
+      <div id="tile-grid" class="tile-grid"></div>
+      <div class="pool-controls pool-controls--three">
+        <button type="button" id="clear-wrong-btn" class="btn-pill pressable">Clear</button>
+        <button type="button" id="submit-btn" class="btn-pill pressable">Submit</button>
+        <button type="button" id="new-puzzle-btn" class="btn-pill pressable">New Puzzle</button>
+      </div>
+      <p id="score-result" class="score-result" hidden></p>
+    </div>
+  </section>
+
+  <script src="daily.js" defer></script>
+  <script src="puzzles/prototype-01.js" defer></script>
+  <script src="script-v2.js" defer></script>
+</body>
+</html>

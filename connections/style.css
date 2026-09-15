@@ -1,0 +1,670 @@
+/* Korean Connections — unified NYT cream tile styling for S1 + S2 */
+
+:root {
+  --cream: #ece9e0;
+  --cream-hover: #e2dfd5;
+  --pool-grey: #e4e4e2;
+  --pool-grey-hover: #d8d8d4;
+  --text-dark: #2a2a28;
+  --text-muted: #6b6b68;
+  --ease-out: ease-out;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --tile-radius: 8px;
+  --tile-gap: 8px;
+  --tile-outline-width: 1px;
+  --tile-outline: #8a8a86;
+  --tile-outline-hover: #6b6b68;
+  --tile-select-width: 2px;
+  --board-max: 560px;
+  --board-pad: 20px;
+  --tile-font: clamp(1.2rem, 4.4vw, 1.55rem);
+  --tile-english-font: clamp(0.58rem, 2.2vw, 0.72rem);
+  --label-font: clamp(0.92rem, 2.9vw, 1.08rem);
+  --incorrect-red: rgba(160, 40, 40, 0.78);
+  --select-ring: #2a2a28;
+  --selected-bg: #000;
+
+  /* Category palette — darker tints for Section 1 */
+  --cat-green-fill: #b8ccc0;
+  --cat-green-hover: #a8beb2;
+  --cat-green-label: #4a6b52;
+
+  --cat-blue-fill: #b4c4d8;
+  --cat-blue-hover: #a4b4cc;
+  --cat-blue-label: #4a5a78;
+
+  --cat-purple-fill: #c0b4c8;
+  --cat-purple-hover: #b0a4b8;
+  --cat-purple-label: #5e4a68;
+
+  --cat-orange-fill: rgba(242, 173, 115, 0.35);
+  --cat-orange-hover: rgba(242, 173, 115, 0.45);
+  --cat-orange-label: #9a7050;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text-dark);
+  background: #fff;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.app-header {
+  width: min(100%, var(--board-max) + var(--board-pad) * 2);
+  max-width: calc(var(--board-max) + var(--board-pad) * 2);
+  margin: 0 auto;
+  padding: 20px var(--board-pad) 4px;
+}
+
+.header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: clamp(1.28rem, 4.2vw, 1.68rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-align: left;
+  color: var(--text-dark);
+}
+
+.puzzle-label {
+  margin: 0;
+  font-size: clamp(0.72rem, 2.4vw, 0.82rem);
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mode-nav {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+}
+
+.mode-link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.mode-link:hover {
+  color: var(--text-dark);
+  text-decoration: underline;
+}
+
+.mode-link.is-active {
+  color: var(--text-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mode-divider {
+  margin: 0 0.4em;
+  color: #c8c8c4;
+  font-weight: 400;
+}
+
+#play-top.section {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.section {
+  width: min(100%, var(--board-max) + var(--board-pad) * 2);
+  max-width: calc(var(--board-max) + var(--board-pad) * 2);
+  margin: 0 auto;
+  padding: 20px var(--board-pad);
+}
+
+#pool.section {
+  padding-top: 8px;
+}
+
+.board-width {
+  width: 100%;
+  max-width: var(--board-max);
+  margin: 0 auto;
+}
+
+.section-divider {
+  border: none;
+  height: 1px;
+  margin: 4px auto;
+  max-width: var(--board-max);
+  width: calc(100% - var(--board-pad) * 2);
+  background: #e6e6e2;
+}
+
+/* --- Shared tile base (S1 slots + S2 pool) — identical cell size --- */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--tile-gap);
+  width: 100%;
+  position: relative;
+}
+
+/* Shared tile look — Section 1 slots and Section 2 pool */
+.tile {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 10px;
+  background: var(--cream);
+  color: var(--text-dark);
+  font-weight: 700;
+  font-size: var(--tile-font);
+  text-align: center;
+  border: none;
+  border-radius: var(--tile-radius);
+  box-shadow: inset 0 0 0 var(--tile-outline-width) var(--tile-outline);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  line-height: 1.25;
+  hyphens: none;
+  transition:
+    background 135ms var(--ease-out),
+    box-shadow 135ms var(--ease-out),
+    transform 100ms var(--ease-out),
+    color 135ms var(--ease-out);
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Section 1: Category board --- */
+.category-board {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--tile-gap) * 2);
+  width: 100%;
+}
+
+.category-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tile-gap);
+}
+
+.category-label {
+  font-weight: 700;
+  font-size: var(--label-font);
+  text-align: center;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+  padding: 0 4px;
+}
+
+/* Section 1 category colors */
+.cat-green .category-label { color: var(--cat-green-label); }
+.cat-blue .category-label { color: var(--cat-blue-label); }
+.cat-purple .category-label { color: var(--cat-purple-label); }
+.cat-orange .category-label { color: var(--cat-orange-label); }
+
+#category-board .cat-green .drop-slot:not(.incorrect) {
+  background: var(--cat-green-fill);
+}
+#category-board .cat-blue .drop-slot:not(.incorrect) {
+  background: var(--cat-blue-fill);
+}
+#category-board .cat-purple .drop-slot:not(.incorrect) {
+  background: var(--cat-purple-fill);
+}
+#category-board .cat-orange .drop-slot:not(.incorrect) {
+  background: var(--cat-orange-fill);
+}
+
+#category-board .cat-green .drop-slot.empty:hover:not(.incorrect) {
+  background: var(--cat-green-hover);
+}
+#category-board .cat-blue .drop-slot.empty:hover:not(.incorrect) {
+  background: var(--cat-blue-hover);
+}
+#category-board .cat-purple .drop-slot.empty:hover:not(.incorrect) {
+  background: var(--cat-purple-hover);
+}
+#category-board .cat-orange .drop-slot.empty:hover:not(.incorrect) {
+  background: var(--cat-orange-hover);
+}
+
+#category-board .drop-slot:not(.incorrect):hover {
+  box-shadow: inset 0 0 0 var(--tile-outline-width) var(--tile-outline-hover);
+}
+
+.drop-slot.empty {
+  cursor: pointer;
+}
+
+.drop-slot.filled {
+  cursor: pointer;
+}
+
+#category-board .drop-slot.filled.selected {
+  background: var(--selected-bg);
+  color: #fff;
+  box-shadow: none;
+}
+
+#category-board .drop-slot.filled.selected .slot-english {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+#category-board .drop-slot.filled.incorrect.selected {
+  background: var(--selected-bg);
+  color: #fff;
+}
+
+.drop-slot.with-translation {
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 6px;
+}
+
+.drop-slot .slot-korean {
+  font-size: var(--tile-font);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.drop-slot .slot-english {
+  font-size: var(--tile-english-font);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-muted);
+}
+
+.drop-slot.filled.incorrect {
+  background: var(--incorrect-red);
+  color: var(--text-dark);
+  box-shadow: inset 0 0 0 var(--tile-outline-width) var(--tile-outline);
+}
+
+.drop-slot.filled.incorrect:hover {
+  background: var(--incorrect-red);
+  box-shadow: inset 0 0 0 var(--tile-outline-width) var(--tile-outline);
+}
+
+/* Section 2 — light grey pool tiles */
+#tile-grid .pool-tile {
+  background: var(--pool-grey);
+}
+
+#tile-grid .pool-tile:hover:not(.selected) {
+  background: var(--pool-grey-hover);
+  box-shadow: inset 0 0 0 var(--tile-outline-width) var(--tile-outline-hover);
+}
+
+.pool-tile {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#tile-grid .pool-tile.selected {
+  background: var(--selected-bg);
+  color: #fff;
+  box-shadow: none;
+  transform: scale(1.04);
+}
+
+#tile-grid .pool-tile.selected:hover {
+  background: var(--selected-bg);
+  color: #fff;
+  box-shadow: none;
+}
+
+.pool-tile.pressable:active:not(.selected) {
+  transform: scale(0.98);
+}
+
+/* --- Section 2: Hint + pool controls --- */
+.pool-hint {
+  margin: 0 0 10px;
+  font-size: clamp(0.78rem, 2.4vw, 0.88rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.pool-hint.return-active {
+  cursor: pointer;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.pool-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.pool-controls--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.score-result {
+  margin: 14px 0 0;
+  font-size: clamp(0.95rem, 3vw, 1.1rem);
+  font-weight: 600;
+  color: var(--text-dark);
+  text-align: center;
+}
+
+.score-result.score-perfect {
+  color: var(--cat-green-label);
+}
+
+.pool-controls .btn-pill.is-disabled,
+.pool-controls .btn-pill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pool-tile--locked {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.pool-controls .btn-pill {
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  padding: 5px 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c8c8c4;
+  color: var(--text-dark);
+  background: #fafaf8;
+  border-radius: 20px;
+}
+
+.pool-controls .btn-pill:hover {
+  background: #f0f0ec;
+  color: var(--text-dark);
+  border-color: #a8a8a4;
+}
+
+.pool-controls .btn-pill:active {
+  background: #e8e8e4;
+}
+
+/* --- Buttons --- */
+.pressable {
+  transition: transform 120ms var(--ease-out);
+}
+
+.btn-pill {
+  padding: 10px 28px;
+  border-radius: 24px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid var(--text-dark);
+  background: #fff;
+  color: var(--text-dark);
+}
+
+.btn-pill:hover {
+  background: #f5f5f2;
+}
+
+.btn-pill.ready {
+  background: var(--text-dark);
+  color: #fff;
+}
+
+.btn-pill.ready:hover {
+  background: #1a1a18;
+}
+
+/* --- Win modal --- */
+/* Must not set display:flex unless .visible — otherwise [hidden] is overridden in Firefox */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.modal-backdrop.visible {
+  display: flex;
+  pointer-events: auto;
+}
+
+.modal-backdrop[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.results-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.modal-close-btn:hover {
+  color: var(--text-dark);
+  background: #f0f0ec;
+}
+
+.modal-backdrop.visible .results-modal {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.modal-sub {
+  margin: 0 0 24px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  :root {
+    --board-max: 100%;
+    --tile-gap: 6px;
+    --tile-font: clamp(0.82rem, 3.4vw, 1rem);
+    --tile-english-font: clamp(0.5rem, 2vw, 0.62rem);
+    --label-font: clamp(0.8rem, 3.1vw, 0.92rem);
+  }
+
+  .section {
+    padding: 16px 12px;
+  }
+
+  .tile {
+    aspect-ratio: 5 / 4;
+    padding: 6px 4px;
+    line-height: 1.15;
+  }
+
+  .drop-slot.with-translation {
+    padding: 5px 3px;
+    gap: 1px;
+  }
+
+  .drop-slot .slot-korean {
+    line-height: 1.1;
+  }
+
+  .drop-slot .slot-english {
+    line-height: 1.1;
+  }
+
+  #tile-grid .pool-tile.selected {
+    transform: scale(1.02);
+  }
+
+  #tile-grid .pool-tile.selected:hover {
+    transform: scale(1.02);
+  }
+
+  /* Practice + One Shot: fit on one screen (iPhone 11 / Pixel) */
+  body.placement-mode {
+    min-height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.placement-mode .app-header {
+    padding: 8px 12px 2px;
+  }
+
+  body.placement-mode .app-title {
+    font-size: 1.05rem;
+  }
+
+  body.placement-mode .puzzle-label {
+    font-size: 0.68rem;
+  }
+
+  body.placement-mode .mode-nav {
+    margin-top: 3px;
+    font-size: 0.72rem;
+  }
+
+  body.placement-mode #play-top.section {
+    padding: 4px 12px 2px;
+  }
+
+  body.placement-mode #pool.section {
+    padding: 2px 12px 2px;
+    padding-bottom: max(2px, env(safe-area-inset-bottom));
+  }
+
+  body.placement-mode .section-divider {
+    margin: 2px auto;
+  }
+
+  body.placement-mode .category-board {
+    gap: 4px;
+  }
+
+  body.placement-mode .category-row {
+    gap: 2px;
+  }
+
+  body.placement-mode .category-label {
+    font-size: 0.6rem;
+    line-height: 1.1;
+    padding: 0;
+    letter-spacing: 0.01em;
+  }
+
+  body.placement-mode .pool-hint {
+    margin: 0 0 4px;
+    font-size: 0.66rem;
+    line-height: 1.15;
+  }
+
+  body.placement-mode .pool-controls {
+    margin-top: 10px;
+    gap: 4px;
+  }
+
+  body.placement-mode .pool-controls .btn-pill {
+    min-height: 26px;
+    padding: 3px 2px;
+    font-size: 0.7rem;
+  }
+
+  body.placement-mode .score-result {
+    margin: 4px 0 0;
+    font-size: 0.82rem;
+  }
+
+  body.placement-mode .tile {
+    aspect-ratio: auto;
+    height: calc((100dvh - 14.25rem) / 8);
+    min-height: 44px;
+    padding: 3px 2px;
+  }
+
+  body.placement-mode .drop-slot.with-translation {
+    padding: 2px 1px;
+    gap: 0;
+  }
+
+  body.placement-mode .drop-slot .slot-korean {
+    font-size: clamp(0.72rem, 3vw, 0.88rem);
+  }
+
+  body.placement-mode .drop-slot .slot-english {
+    font-size: clamp(0.46rem, 1.8vw, 0.56rem);
+  }
+}
+
+@supports not (height: 100dvh) {
+  @media (max-width: 520px) {
+    body.placement-mode {
+      min-height: 100vh;
+      max-height: 100vh;
+    }
+
+    body.placement-mode .tile {
+      height: calc((100vh - 14.25rem) / 8);
+    }
+  }
+}
